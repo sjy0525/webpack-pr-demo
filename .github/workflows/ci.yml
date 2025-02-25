@@ -1,49 +1,32 @@
-name: Build and Deploy
+name: CI Pipeline
 
 on:
   push:
-    branches:
-      - master
-
+    branches: [master]
   pull_request:
-    branches:
-      - master
+    branches: [master]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v3
 
-    - uses: actions/checkout@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          cache: "npm"
 
-    - name: Install dependencies
-      run: | 
-        npm i
+      - name: Install Dependencies
+        run: npm ci
 
-    - name: Build
-      run: npm run build
-      env:
-        DOC_ENV: production
-        NODE_OPTIONS: --max-old-space-size=4096
+      - name: Lint
+        run: npx eslint . --fix
 
-    - name: Deploy
-      uses: JamesIves/github-pages-deploy-action@v4.3.4
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        branch: gh-pages
-        folder: build
-        force: true
-        commit-message: website deploy
-        repository-name: EralChen/simple-vuesri
+      - name: Run Tests
+        run: npm test
 
-    - name: Cleanup
-      run: rm -rf docs/dist
-
-    - name: Deploy to GitHub Pages
-      uses: JamesIves/github-pages-deploy-action@v4.3.4
-      with:
-        branch: gh - pages
-        folder: build
-        token: ${{ secrets.GITHUB_TOKEN }}
-
+      - name: Build Production
+        run: npm run build
