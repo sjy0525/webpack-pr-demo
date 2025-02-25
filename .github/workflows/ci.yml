@@ -40,3 +40,10 @@ jobs:
     - name: Cleanup
       run: rm -rf docs/dist
 
+    - name: Deploy to GitHub Pages
+      uses: JamesIves/github - pages - deploy - action@v4.3.4
+      with:
+        branch: gh - pages
+        folder: build
+        token: ${{ secrets.GITHUB_TOKEN }}
+
